@@ -1,1 +1,4 @@
 .vscode
+.git
+__pycache__
+.gitignore
