@@ -8,6 +8,8 @@ listed_text = []
 app.layout = page.Div([
     page.Header([page.H1('My App', id="head"), dcc.Button("Print", id="print-it")]),
     page.Main([
+
+        page.Div([
         page.Div(
         dcc.RangeSlider(
             marks=None,
@@ -18,11 +20,25 @@ app.layout = page.Div([
             reverse=True,
             # verticalHeight = 800
             ),
-            style={"marginTop":"5px","height": "100%", "width": "50px", "paddingLeft":"20px"}
+            style={"marginTop":"5px","height": "100%", "width": "40px", "paddingInline":"10px"}
         ),
-        page.Div(id="textflow"),
+        page.Div(id="textflow", style={"marginLeft": "2em"
+                                       
+                                       
+                                       }),
         dcc.Store(id="slider_vector")
-        ], style={"display":"flex", "flexDirection": "row", "height":"100vh"}
+
+
+        ], style= {"border":"2px solid red", 
+                   "display":"flex", 
+                   "flexDirection": "row",
+                   "height":"80vh",
+                   "width":"60vw", 
+                   "overflowY": "auto",
+                   "whiteSpace": "nowrap", 
+                   "overflowX": "auto"}
+        )
+        ], style={"height":"100vh"}
     )
 ],
     className="main-bg"
