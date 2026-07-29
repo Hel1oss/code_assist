@@ -22,9 +22,10 @@ app.layout = page.Div([
             ),
             style={"marginTop":"5px","height": "100%", "width": "40px", "paddingInline":"10px"}
         ),
-        page.Div(id="textflow", style={"marginLeft": "2em"
-                                       
-                                       
+        page.Div(id="textflow", style={"marginLeft": "2em",
+                                       "height": "fit-content",
+                                       "overflowY": "hidden",
+                                       "overflowX": "auto"
                                        }),
         dcc.Store(id="slider_vector")
 
@@ -36,7 +37,7 @@ app.layout = page.Div([
                    "width":"60vw", 
                    "overflowY": "auto",
                    "whiteSpace": "nowrap", 
-                   "overflowX": "auto"}
+                    }
         )
         ], style={"height":"100vh"}
     )
