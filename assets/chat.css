@@ -1,0 +1,41 @@
+html, body{
+    margin: 0px;
+    height: 100%;
+    overflow: hidden;
+}
+
+
+.main-bg {
+    background-color: rgb(255, 255, 234);
+    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+#textflow > :nth-child(n){
+    line-height: 1.15em;
+    margin-bottom: 0.15em;
+}
+/* 
+#slider {
+    height: auto;
+
+} */
+
+
+
+.active > :nth-child(n) {
+    opacity: 100%;
+    line-height: 1.15em;
+    margin-bottom: 0.15em;
+}
+
+.inactive {
+    background-color: #3b3b38;
+}
+
+.inactive > :nth-child(n) {
+    opacity: 30%;
+    line-height: 1.15em;
+    margin-bottom: 0.15em;
+}
