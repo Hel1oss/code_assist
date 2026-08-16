@@ -4,38 +4,36 @@ html, body{
     overflow: hidden;
 }
 
-
 .main-bg {
-    background-color: rgb(255, 255, 234);
+    background-color: #1e1e1e;
+    color: white;
     min-height: 100vh;
     height: 100vh;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+}
+
+.chat-nav {
+    width: 300px;
+    border: 1px solid red;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1em;
+    transition: width 0.3s ease, padding 0.3s ease, overflow 0s linear 0.3s;
 }
 
-#textflow > :nth-child(n){
-    line-height: 1.15em;
-    margin-bottom: 0.15em;
-}
-/* 
-#slider {
-    height: auto;
-
-} */
-
-
-
-.active > :nth-child(n) {
-    opacity: 100%;
-    line-height: 1.15em;
-    margin-bottom: 0.15em;
+.chat-nav-hid {
+    width: 20px;
+    border: 1px solid red;
+    overflow: hidden;
+    padding: 1em;
+    transition: width 0.3s ease, padding 0.3s ease;
 }
 
-.inactive {
-    background-color: #3b3b38;
-}
-
-.inactive > :nth-child(n) {
-    opacity: 30%;
-    line-height: 1.15em;
-    margin-bottom: 0.15em;
+.chat-main {
+    flex: 1;
+    border: 1px solid red;
+    overflow: auto;
+    padding: 1em;
 }
