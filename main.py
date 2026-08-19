@@ -1,31 +1,58 @@
 import dash 
-from dash import html as page, dcc, Input, Output, State, callback, ctx, callback_context, no_update
+from dash import html as page, dcc, Input, Output, State, MATCH, ALL, callback, ctx, callback_context, no_update
 import dash_bootstrap_components as dbc
 import time
 app = dash.Dash(__name__)
+items = ["Overview", "BooleanSwitch", "ColorPicker", "Gauge", "GraduatedBar"]
 
-def navbar_open():
+
+def navbar_open(items):
      return [
-          page.P("close"),
-          dbc.Button('tab', id="open-nav")
-     ]
+     page.P("close"),
+     page.Div([
+     page.Div(
+     [
+        item, 
+        dbc.Button(
+               "D",
+               id={"type": "Del", "index": item},
+               color="danger",
+               style={"margin-left": "auto"},
+               ),
+        ],
+        id={"type": "item", "index": item},
+        className="sidebar-item",
+        n_clicks=0,
+    )
+    for item in items
+     ])
+]
 
 def navbar_close(): 
      return [
           page.P("Op"),
-          dbc.Button('tab', id="open-nav")
+          
      ]
 
 messages = []
 app.layout = page.Div([
-   
-    page.Div(navbar_open(), 
-              className="chat-nav",
-              id="navbar"
+    
+    page.Div( page.Div(className="chat-nav",
+              id="navbar")
             ),
     dcc.Store(id='chat-store-u'),
     dcc.Store(id='chat-store-b'),
+    dcc.Store(
+            id="items-store",
+            data=items
+        ),
     page.Div([
+        dbc.Button('tab', id="open-nav", style={
+                                                  'position': "absolute",
+                                                  "top": "10px",
+                                                  "left": "10px",
+                                                  "zIndex": 1000,
+                                             }), 
         page.Div([
          page.Header([page.H1('My App')], 
                      style={"margin": "auto"}
@@ -50,16 +77,61 @@ app.layout = page.Div([
 
 @callback(Output('navbar', 'className'),
           Output('navbar', 'children'),
-          Input('open-nav', 'n_clicks'))
-def navbar_side(value, count=[0]):
-      count[0] += value if value else 0 
-      print(count[0])
-      if value and count[0]%2 == 1:
-           return "chat-nav-hid", navbar_close()
-      else:
-           return "chat-nav", navbar_open()
+          Input('open-nav', 'n_clicks'),
+          Input("items-store", "data"))
+def navbar_side(n_clicks, data):
+     n_clicks = n_clicks or 0
+
+     if n_clicks % 2:
+        return "chat-nav-hid", navbar_close()
+
+     return "chat-nav", navbar_open(data)
+
+@callback(
+    Output({"type": "item", "index": ALL}, "className"),
+    Input({"type": "item", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def select_item(_):
+    if not ctx.triggered_id:
+        return no_update
+
+    clicked = ctx.triggered_id["index"]
+
+    return [
+        "sidebar-item active"
+        if item["id"]["index"] == clicked
+        else "sidebar-item"
+        for item in ctx.inputs_list[0]
+    ]
 
 
+@callback(
+    Output("items-store", "data"),
+    Input({"type": "Del", "index": ALL}, "n_clicks"),
+    State("items-store", "data"),
+    prevent_initial_call=True,
+)
+def delete_item(clicks, items):
+    if not ctx.triggered_id:
+        return no_update
+
+    # no button has been clicked
+    if not any(c for c in clicks if c):
+        return no_update
+
+
+    clicked = ctx.triggered_id["index"]
+    print(clicked)
+    return [item for item in items if item != clicked]
+
+# @callback(
+#     Output({"type": "Del", "index": ALL}, "className"),
+#     Input({"type": "Del", "index": ALL}, "n_clicks"),
+#     prevent_initial_call=True,
+# )
+
+####--------------------------------------------------------
 
 def chat_user(text):
      return page.P(text, 

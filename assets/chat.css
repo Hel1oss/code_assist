@@ -37,6 +37,7 @@ html, body{
     flex-direction: column;
     border: 1px solid red;
     overflow: hidden;
+    position: relative;
 }
 
 .chat-scroll {
@@ -62,3 +63,11 @@ html, body{
     flex-direction: row;
     gap: 8px;
 }
+
+.sidebar-item { padding: 8px 10px; 
+                cursor: pointer;
+                color: #9b9bb8;
+                display: flex;
+                align-items: center;}
+.sidebar-item:hover { background: #1c1c28; color: #ffffff; }
+.sidebar-item.active { background: #2a2a4a; color: #ffffff; border-radius: 6px; }
