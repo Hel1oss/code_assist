@@ -2,42 +2,18 @@ import dash
 from dash import html as page, dcc, Input, Output, State, MATCH, ALL, callback, ctx, callback_context, no_update
 import dash_bootstrap_components as dbc
 import time
+from assets.custom_component import *
 app = dash.Dash(__name__)
-items = ["Overview", "BooleanSwitch", "ColorPicker", "Gauge", "GraduatedBar"]
+items_list = ["abv", "Overview", "BooleanSwitch", "ColorPicker", "Gauge bar", "GraduatedBar"]
+items = [{"id":id, "label":label} for id, label in enumerate(items_list, start=1)]
 
-
-def navbar_open(items):
-     return [
-     page.P("close"),
-     page.Div([
-     page.Div(
-     [
-        item, 
-        dbc.Button(
-               "D",
-               id={"type": "Del", "index": item},
-               color="danger",
-               style={"margin-left": "auto"},
-               ),
-        ],
-        id={"type": "item", "index": item},
-        className="sidebar-item",
-        n_clicks=0,
-    )
-    for item in items
-     ])
-]
-
-def navbar_close(): 
-     return [
-          page.P("Op"),
-          
-     ]
 
 messages = []
 app.layout = page.Div([
     
-    page.Div( page.Div(className="chat-nav",
+    page.Div( page.Div(
+            ### Loaded from callback and Live in the custom_component
+              className="chat-nav",
               id="navbar")
             ),
     dcc.Store(id='chat-store-u'),
@@ -47,12 +23,14 @@ app.layout = page.Div([
             data=items
         ),
     page.Div([
-        dbc.Button('tab', id="open-nav", style={
-                                                  'position': "absolute",
-                                                  "top": "10px",
-                                                  "left": "10px",
-                                                  "zIndex": 1000,
-                                             }), 
+        custom_button(Images("hamburger.svg"), 
+                      "open-nav",
+                      styles={'position': "absolute",
+                            "top": "10px",
+                            "left": "10px",
+                            "zIndex": 1000
+                            }
+                      ), 
         page.Div([
          page.Header([page.H1('My App')], 
                      style={"margin": "auto"}
@@ -62,7 +40,8 @@ app.layout = page.Div([
           id="chat"
      ),
         page.Div([
-          dbc.Input(id="chat-box"),
+          html.Div(id="dummy", style={"display": "none"}),
+          dbc.Textarea(id="chat-box", style={"overflow": "hidden", "resize": "none", "height":"24px"}),
           dbc.Button('send', id='send')
         ],
           className="chat-input"
@@ -74,6 +53,19 @@ app.layout = page.Div([
     className="main-bg"
 )
 
+@callback(
+    Output("chat-box", "style"),
+    Input("chat-box", "value"),
+)
+def resize_textarea(value):
+    lines = max(1, len((value or "").split("\n")))
+
+    return {
+        "overflow": "auto",
+        "resize": "none",
+        "height": f"{lines * 24}px",
+        "maxHeight": f"{24 * 5}px",
+    }
 
 @callback(Output('navbar', 'className'),
           Output('navbar', 'children'),
@@ -90,29 +82,30 @@ def navbar_side(n_clicks, data):
 @callback(
     Output({"type": "item", "index": ALL}, "className"),
     Input({"type": "item", "index": ALL}, "n_clicks"),
+    State("items-store", "data"),
     prevent_initial_call=True,
 )
-def select_item(_):
+def select_item(_, data):
     if not ctx.triggered_id:
         return no_update
 
-    clicked = ctx.triggered_id["index"]
-
+    item_id = ctx.triggered_id["index"]
+    values = next(i['label'] for i in data if i['id'] == item_id)
     return [
         "sidebar-item active"
-        if item["id"]["index"] == clicked
+        if item["id"]["index"] == item_id
         else "sidebar-item"
         for item in ctx.inputs_list[0]
     ]
 
 
 @callback(
-    Output("items-store", "data"),
+    Output("items-store", "data", allow_duplicate=True),
     Input({"type": "Del", "index": ALL}, "n_clicks"),
     State("items-store", "data"),
     prevent_initial_call=True,
 )
-def delete_item(clicks, items):
+def delete_item(clicks, data):
     if not ctx.triggered_id:
         return no_update
 
@@ -121,9 +114,31 @@ def delete_item(clicks, items):
         return no_update
 
 
-    clicked = ctx.triggered_id["index"]
-    print(clicked)
-    return [item for item in items if item != clicked]
+    item_id = ctx.triggered_id["index"]
+    values = next(i['label'] for i in data if i['id'] == item_id)
+    print(values)
+    return [item for item in data if item['label'] != values]
+
+
+@callback(
+    Output("items-store", "data", allow_duplicate=True),
+    Input({"type": "rename", "index": ALL}, "value"),
+    State("items-store", "data"),
+    prevent_initial_call=True,
+)
+def rename_item(values, items):
+    if not ctx.triggered_id:
+        return no_update
+
+    item_id = ctx.triggered_id["index"]
+
+    for value, item in zip(values, items):
+        if item["id"] == item_id:
+            item["label"] = value
+            break
+
+    return items
+
 
 # @callback(
 #     Output({"type": "Del", "index": ALL}, "className"),
@@ -132,27 +147,6 @@ def delete_item(clicks, items):
 # )
 
 ####--------------------------------------------------------
-
-def chat_user(text):
-     return page.P(text, 
-                   style={"margin-left": "auto", 
-                         "border":"1px red solid", 
-                         "gap":"1em", 
-                         "borderRadius":"20px 20px 0px 20px",
-                         "padding":"1em",
-                         "maxWidth":"60%",
-                         "whiteSpace":"pre-wrap"}
-                         )
-def chat_bot(text):
-     return page.Div(text, 
-                   style={"margin-right": "auto", 
-                         "border":"1px lime solid", 
-                         "gap":"1em", 
-                         "borderRadius":"20px 20px 20px 0px",
-                         "padding":"1em",
-                         "maxWidth":"60%",
-                         "whiteSpace":"pre-wrap"}
-                         )
 
 lorem = """Lorem Ipsum is simply dummy text of the printing 
 and typesetting industry. Lorem Ipsum has been the 
